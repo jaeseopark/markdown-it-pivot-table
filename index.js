@@ -144,7 +144,7 @@ const generateTableTokens = (table) => {
             return stringMath(cellValue);
           }
         });
-        return AGGREGATORS[column.aggregator](individualValues);
+        return AGGREGATORS[column.aggregator](individualValues).toFixed(2);
       }
     });
 
