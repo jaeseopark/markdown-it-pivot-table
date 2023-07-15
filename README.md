@@ -2,29 +2,23 @@
 
 A markdown-it plugin to add pivot table support. Aggregate numeric values with: `CNT()`, `MIN()`, `MAX()`, `SUM()`, and `AVG()`.
 
-### Usage
+## Usage
 
 ```js
 const mdp = require('markdown-it-pivot-table');
 const md = require('markdown-it')().use(mdp);
 
-const source = "...";
-
-const result = md.render(source);
-console.log(result);
-```
-
-## Examples
-
-### Simple Aggregation
-
-```
+const source = `
 |Group=Item|Cost=SUM()|
 |---|---|
 |Candies|1.00|
 |Chips|3.00|
 |Candies|1.00|
 |Drinks|2.00|
+`;
+
+const result = md.render(source);
+console.log(result);
 ```
 
 Result:
@@ -35,7 +29,7 @@ Result:
 | Chips   | 3.00 | 
 | Drinks  | 2.00 | 
 
-### Computed Fields
+### Computed Cells
 
 Reference column names with curly braces to compute numeric values on the fly:
 
@@ -54,7 +48,7 @@ Result:
 | Electrical | Wires        | 249.80   | 
 | Electrical | Devices      | 89.91    | 
 
-### Equation-in-header
+### In-header Equations
 
 If all rows have the same value for a column, then specify the equation right in the header line and leave the cells blank:
 
