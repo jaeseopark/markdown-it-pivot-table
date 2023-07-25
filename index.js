@@ -4,7 +4,7 @@ const groupBy = require("group-by");
 const stringMath = require("string-math");
 
 const RE_VARIABLE_SUBSTITUTE = /{[^}]+}/g;
-const RE_AGGREGATED_VALUE = /^(SUM|AVG|MIN|MAX|CNT)\((.*)\)/;
+const RE_AGGREGATED_VALUE = /^(SUM|AVG|MIN|MAX|CNT|ANY)\((.*)\)/;
 
 const sum = (values) => values.reduce((a, b) => a + (b || 0), 0);
 
@@ -36,11 +36,10 @@ const sliceByTokenTypes = (tokens, startType, endType) => {
 
 const toTable = (tokens) => {
   let isPivotTable = false;
-  let aggregatedColumn = null;
+  let foundAggregatedColumn = false;
 
   const columns = sliceByTokenTypes(tokens, "th_open", "th_close").map(
-    (column_tokens, i, arr) => {
-      const isLastColumn = i === arr.length - 1;
+    (column_tokens, i) => {
       const content = column_tokens[1].content;
       const containsEqual = content.includes("=");
 
@@ -48,16 +47,16 @@ const toTable = (tokens) => {
         isPivotTable = true;
         const [left, right] = content.split("="); // TODO: need error handling for multiple equal signs.
 
-        if (isLastColumn) {
-          const match = right.trim().match(RE_AGGREGATED_VALUE);
-          aggregatedColumn = {
+        const match = right.trim().match(RE_AGGREGATED_VALUE);
+        if (match) {
+          foundAggregatedColumn = true;
+          return {
             index: i,
             type: "aggregated",
             name: left.trim(),
             aggregator: match[1],
             equation: match[2],
           };
-          return aggregatedColumn;
         }
 
         return {
@@ -83,7 +82,7 @@ const toTable = (tokens) => {
     )
   );
 
-  if (!isPivotTable || !aggregatedColumn) {
+  if (!isPivotTable || !foundAggregatedColumn) {
     return {
       isPivotTable,
     };
@@ -138,6 +137,11 @@ const generateTableTokens = (table) => {
         // return the cell value of the first row
         return rows[0][column.index];
       } else if (column.type === "aggregated") {
+        if (column.aggregator === "ANY") {
+          return rows
+            .map((row) => row[column.index] || "")
+            .find((value) => value.trim());
+        }
         const individualValues = rows.map((row) => {
           const cellValue = row[column.index];
           if (cellValue) {
