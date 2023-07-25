@@ -1,6 +1,12 @@
 # markdown-it-pivot-table
 
-A markdown-it plugin to add pivot table support. Aggregate numeric values with: `CNT()`, `MIN()`, `MAX()`, `SUM()`, and `AVG()`.
+A markdown-it plugin to add pivot table support.
+
+## Operators
+
+`CNT()`, `MIN()`, `MAX()`, `SUM()`, and `AVG()` work with numeric values.
+
+`ANY()` works with strings.
 
 ## Usage
 
