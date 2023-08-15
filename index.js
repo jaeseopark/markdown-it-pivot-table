@@ -47,16 +47,18 @@ const toTable = (tokens) => {
         isPivotTable = true;
         const [left, right] = content.split("="); // TODO: need error handling for multiple equal signs.
 
-        const match = right.trim().match(RE_AGGREGATED_VALUE);
-        if (match) {
-          foundAggregatedColumn = true;
-          return {
-            index: i,
-            type: "aggregated",
-            name: left.trim(),
-            aggregator: match[1],
-            equation: match[2],
-          };
+        if (right) {
+          const match = right.trim().match(RE_AGGREGATED_VALUE);
+          if (match) {
+            foundAggregatedColumn = true;
+            return {
+              index: i,
+              type: "aggregated",
+              name: left.trim(),
+              aggregator: match[1],
+              equation: match[2],
+            };
+          }
         }
 
         return {
