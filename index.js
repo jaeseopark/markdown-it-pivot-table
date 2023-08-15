@@ -41,11 +41,11 @@ const toTable = (tokens) => {
   const columns = sliceByTokenTypes(tokens, "th_open", "th_close").map(
     (column_tokens, i) => {
       const content = column_tokens[1].content.trim();
-      const containsEqual = content.includes("=");
+      const containsEqual = content.includes("="); // TODO: consider validations for multiple equal signs.
 
       if (containsEqual) {
         isPivotTable = true;
-        const [left, right] = content.split("=").map((s) => s.trim()); // TODO: need error handling for multiple equal signs.
+        const [left, right] = content.split("=").map((s) => s.trim());
 
         if (!left || !right) {
           throw new Error(
