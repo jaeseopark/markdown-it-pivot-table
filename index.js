@@ -40,12 +40,12 @@ const toTable = (tokens) => {
 
   const columns = sliceByTokenTypes(tokens, "th_open", "th_close").map(
     (column_tokens, i) => {
-      const content = column_tokens[1].content;
+      const content = column_tokens[1].content.trim();
       const containsEqual = content.includes("=");
 
       if (containsEqual) {
         isPivotTable = true;
-        const [left, right] = content.split("="); // TODO: need error handling for multiple equal signs.
+        const [left, right] = content.split("=").map((s) => s.trim()); // TODO: need error handling for multiple equal signs.
 
         if (!left || !right) {
           throw new Error(
@@ -53,13 +53,13 @@ const toTable = (tokens) => {
           );
         }
 
-        const match = right.trim().match(RE_AGGREGATED_VALUE);
+        const match = right.match(RE_AGGREGATED_VALUE);
         if (match) {
           foundAggregatedColumn = true;
           return {
             index: i,
             type: "aggregated",
-            name: left.trim(),
+            name: left,
             aggregator: match[1],
             equation: match[2],
           };
@@ -67,15 +67,15 @@ const toTable = (tokens) => {
 
         return {
           index: i,
-          type: left.trim().toLowerCase(),
-          name: right.trim(),
+          type: left.toLowerCase(),
+          name: right,
         };
       }
 
       return {
         index: i,
         type: "regular",
-        name: content.trim(),
+        name: content,
       };
     }
   );
