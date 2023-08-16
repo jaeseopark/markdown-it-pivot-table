@@ -1,5 +1,5 @@
 const md = require("markdown-it")();
-const csvToMarkdown = require("csv-to-markdown-table");
+const TableBuilder = require("nd-table").Table;
 const groupBy = require("group-by");
 const stringMath = require("string-math");
 
@@ -167,16 +167,12 @@ const generateTableTokens = (table) => {
     )
   );
 
-  const aggregatedGroups = groups
-    .map(aggregate)
-    .map((aggregatedRow) => aggregatedRow.join(","));
+  const tableBuilder = TableBuilder.fromData(
+    [table.visibleColumns.map((col) => col.name), ...groups.map(aggregate)],
+    true // this indicates that the first row is the column header.
+  );
 
-  const csv = [
-    table.visibleColumns.map((col) => col.name).join(","), // header
-    ...aggregatedGroups, // groups
-  ];
-
-  const stringified = csvToMarkdown(csv.join("\n"), ",", true);
+  const stringified = tableBuilder.toMarkdown();
   const tokens = md.parse(stringified);
   return tokens;
 };
